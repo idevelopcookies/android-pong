@@ -40,7 +40,14 @@
 				android:width="220dp"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"></Button>	
-						
+			
+			<Button
+				android:text="@string/wifi_play"
+				android:id="@+id/title_btnWifiPlay"
+				android:width="220dp"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"></Button>			
+				
 			<Button
 				android:text="@string/no_players"
 				android:id="@+id/title_btnNoPlayer"
