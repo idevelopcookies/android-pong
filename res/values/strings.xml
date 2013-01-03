@@ -15,5 +15,5 @@
     
     <string name="join_in">Touch to join in!</string>
 	<string name="pause">Pause</string>
-	<string name="wifi_play">Play Wifi-Direct</string>
+	<string name="host_multi_play">Host Multi-Player</string><string name="join_multi_play">Join Multi-Player</string>
 </resources>

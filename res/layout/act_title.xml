@@ -42,11 +42,18 @@
 				android:layout_height="wrap_content"></Button>	
 			
 			<Button
-				android:text="@string/wifi_play"
-				android:id="@+id/title_btnWifiPlay"
+				android:text="@string/host_multi_play"
+				android:id="@+id/title_btnHostMultiPlay"
 				android:width="220dp"
 				android:layout_width="wrap_content"
 				android:layout_height="wrap_content"></Button>			
+				
+			<Button
+				android:text="@string/join_multi_play"
+				android:id="@+id/title_btnJoinMultiPlay"
+				android:width="220dp"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"></Button>	
 				
 			<Button
 				android:text="@string/no_players"

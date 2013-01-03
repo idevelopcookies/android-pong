@@ -1,17 +1,10 @@
 package org.oep.pong;
 
-import org.oep.pong.wifi.PongWifiReciever;
+import org.euss.multi.BluetoothPeerSelector;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.wifi.p2p.WifiP2pConfig;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pManager;
-import android.net.wifi.p2p.WifiP2pManager.ActionListener;
-import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,9 +13,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 
 public class Pong extends Activity {
-	private WifiP2pManager mManager;
-	private Channel mChannel;
-	private BroadcastReceiver mReceiver;
+//	private WifiP2pManager mManager;
+//	private Channel mChannel;
+//	private BroadcastReceiver mReceiver;
 	private IntentFilter mIntentFilter;
 
 	protected void onCreate(Bundle icicle) {
@@ -70,10 +63,26 @@ public class Pong extends Activity {
 					}
 				});
 
-		this.findViewById(R.id.title_btnWifiPlay).setOnClickListener(
+
+		this.findViewById(R.id.title_btnJoinMultiPlay).setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						searchForOpponents();
+						Intent i = new Intent(v.getContext(), BluetoothPeerSelector.class);
+						Bundle bundle = new Bundle();
+					    bundle.putBoolean("isGameHost", false);
+					    i.putExtras(bundle);
+						startActivity(i);
+					}
+				});
+		
+		this.findViewById(R.id.title_btnHostMultiPlay).setOnClickListener(
+				new OnClickListener() {
+					public void onClick(View v) {
+						Intent i = new Intent(v.getContext(), BluetoothPeerSelector.class);
+						Bundle bundle = new Bundle();
+					    bundle.putBoolean("isGameHost", true);
+					    i.putExtras(bundle);
+						startActivity(i);
 					}
 				});
 	}
@@ -85,51 +94,51 @@ public class Pong extends Activity {
 		startActivity(i);
 	}
 
-	protected void searchForOpponents() {
-		initializeWifiManager();
-		
-		//Find other peers
-		mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
-			public void onSuccess() {
-				WifiP2pDevice device;
-				WifiP2pConfig config = new WifiP2pConfig();
-//				config.deviceAddress = device.deviceAddress;
-				mManager.connect(mChannel, config, new ActionListener() {
-
-				    public void onSuccess() {
-				        //success logic
-				    }
-
-				    public void onFailure(int reason) {
-				        //failure logic
-				    }
-				});
-			}
-
-			public void onFailure(int reasonCode) {
-			}
-		});
-	}
+//	protected void searchForOpponents() {
+//		initializeWifiManager();
+//		
+//		//Find other peers
+//		mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+//			public void onSuccess() {
+//				WifiP2pDevice device;
+//				WifiP2pConfig config = new WifiP2pConfig();
+////				config.deviceAddress = device.deviceAddress;
+//				mManager.connect(mChannel, config, new ActionListener() {
+//
+//				    public void onSuccess() {
+//				        //success logic
+//				    }
+//
+//				    public void onFailure(int reason) {
+//				        //failure logic
+//				    }
+//				});
+//			}
+//
+//			public void onFailure(int reasonCode) {
+//			}
+//		});
+//	}
 	
-	private void initializeWifiManager(){
-		mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-		mChannel = mManager.initialize(this, getMainLooper(), null);
-		mReceiver = new PongWifiReciever(mManager, mChannel, this);
-
-		mIntentFilter = new IntentFilter();
-		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-		mIntentFilter
-				.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-		mIntentFilter
-				.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-		registerReceiver(mReceiver, mIntentFilter);
-	}
+//	private void initializeWifiManager(){
+//		mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+//		mChannel = mManager.initialize(this, getMainLooper(), null);
+//		mReceiver = new PongWifiReciever(mManager, mChannel, this);
+//
+//		mIntentFilter = new IntentFilter();
+//		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+//		mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+//		mIntentFilter
+//				.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+//		mIntentFilter
+//				.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+//		registerReceiver(mReceiver, mIntentFilter);
+//	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		unregisterReceiver(mReceiver);
+//		unregisterReceiver(mReceiver);
 	}
 
 	public static final String PREF_BALL_SPEED = "ball_speed",
