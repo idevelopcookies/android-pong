@@ -1,5 +1,6 @@
 package org.oep.pong;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import android.content.Context;
@@ -8,8 +9,8 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.Paint.Style;
+import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.SoundPool;
 import android.os.Handler;
@@ -29,7 +30,7 @@ import android.widget.Toast;
  * @author OEP
  *
  */
-public class PongView extends View implements OnTouchListener, OnKeyListener {
+public class PongView extends View implements OnTouchListener, OnKeyListener, Serializable {
 	/** Debug tag */
 	@SuppressWarnings("unused")
 	private static final String TAG = "PongView";
@@ -48,7 +49,7 @@ public class PongView extends View implements OnTouchListener, OnKeyListener {
 	public static enum State { Running, Stopped}
 
 	/** Flag that marks this view as initialized */
-	private boolean mInitialized = false;
+	private transient boolean mInitialized = false;
 	
 	/** Preferences loaded at startup */
 	private int mBallSpeedModifier;
@@ -57,10 +58,10 @@ public class PongView extends View implements OnTouchListener, OnKeyListener {
 	private int mLivesModifier;
 		
 	/** AI Strategy */
-	private int mAiStrategy;
+	private transient int mAiStrategy;
 	
 	/** CPU handicap */
-	private int mCpuHandicap;
+	private transient int mCpuHandicap;
 	
 	/** Starts a new round when set to true */
 	private boolean mNewRound = true;
@@ -69,12 +70,12 @@ public class PongView extends View implements OnTouchListener, OnKeyListener {
 	private boolean mContinue = true;
 	
 	/** Mutes sounds when true */
-	private boolean mMuted = false;
+	private transient boolean mMuted = false;
 
 	private Paddle mRed, mBlue;
 	
 	/** Touch boxes for various functions. These are assigned in initialize() */
-	private Rect mPauseTouchBox;
+	private transient Rect mPauseTouchBox;
 
 	/** Timestamp of the last frame created */
 	private long mLastFrame = 0;
@@ -85,24 +86,26 @@ public class PongView extends View implements OnTouchListener, OnKeyListener {
 	private static final Random RNG = new Random();
 	
 	/** Pool for our sound effects */
-	protected SoundPool mPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
+	protected transient SoundPool mPool = new SoundPool(3, AudioManager.STREAM_MUSIC, 0);
 	
-	protected int mWinSFX, mMissSFX, mPaddleSFX, mWallSFX;
+	protected  transient int mWinSFX, mMissSFX, mPaddleSFX, mWallSFX;
 	
 	/** Paint object */
-	private final Paint mPaint = new Paint();
+	private transient final Paint mPaint = new Paint();
 
 	/** Padding for touch zones and paddles */
-	private static final int PADDING = 3;
+	private transient static final int PADDING = 3;
 	
 	/** Scrollwheel sensitivity */
-	private static final int SCROLL_SENSITIVITY = 80;
+	private transient static final int SCROLL_SENSITIVITY = 80;
 
 	/** Redraws the screen according to FPS */
-	private RefreshHandler mRedrawHandler = new RefreshHandler();
+	private transient RefreshHandler mRedrawHandler = new RefreshHandler();
 	
 	/** Flags indicating who is a player */
-	private boolean mRedPlayer = false, mBluePlayer = false;
+	private transient boolean mRedPlayer = false, mBluePlayer = false;
+	
+	private transient boolean isHost;
 
 	/**
 	 * An overloaded class that repaints this view in a separate thread.

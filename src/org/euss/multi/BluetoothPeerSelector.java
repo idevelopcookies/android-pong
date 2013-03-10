@@ -29,14 +29,17 @@ import android.widget.TextView;
 
 public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 
-	public final static String TAG = "BluetoothAdapter";
+	public final static String HOST_TAG = "BluetoothAdapter_Host";
+	public final static String CLIENT_TAG = "BluetoothAdapter_Client";
 	public final static int REQUEST_ENABLE_BT = 1;
 	public final static String SERVICE_NAME = "PONG_SERVICE";
 	
 	private boolean isHost;
 	private ListView peerView;
 	private List<String> mArrayAdapter;
-	private final UUID BT_PONG_UUID = UUID.randomUUID();
+//	private final UUID BT_PONG_UUID = UUID.randomUUID();
+	 private static final UUID BT_PONG_UUID =
+		        UUID.fromString("8ce255c0-200a-11e0-ac64-0800200c9a66");
 	private BluetoothDevice btDevice;
 	
 	private class ConnectThread extends Thread {
@@ -79,17 +82,18 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 	        try {
 	            // Connect the device through the socket. This will block
 	            // until it succeeds or throws an exception
-	        	Log.e(TAG, "About to connect from client");
+	        	Log.e(CLIENT_TAG, "About to connect from client");
 	            mmSocket.connect();
 	        } catch (IOException connectException) {
 	            // Unable to connect; close the socket and get out
 	            try {
+	            	Log.e(CLIENT_TAG, "Connection failed", connectException);
 	                mmSocket.close();
 	            } catch (IOException closeException) { }
 	            return;
 	        }
 	 
-	        Log.i(TAG, "CONNECTED!!!");
+	        Log.i(CLIENT_TAG, "CONNECTED!!!");
 	        // Do work to manage the connection (in a separate thread)
 //	        manageConnectedSocket(mmSocket);
 	    }
@@ -109,7 +113,7 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 	    }
 	}
 	
-	private class AcceptThread extends Thread {
+	private class AcceptThread extends Thread { 
 	    private final BluetoothServerSocket mmServerSocket;
 	 
 	    public AcceptThread() {
@@ -119,7 +123,9 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 	        try {
 	            // MY_UUID is the app's UUID string, also used by the client code
 	            tmp = BluetoothAdapter.getDefaultAdapter().listenUsingRfcommWithServiceRecord(SERVICE_NAME, BT_PONG_UUID);
-	        } catch (IOException e) { }
+	        } catch (IOException e) { 
+	        	Log.e(HOST_TAG, "Could not create BT Server Socket", e);
+	        }
 	        mmServerSocket = tmp;
 	    }
 	 
@@ -128,14 +134,16 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 	        // Keep listening until exception occurs or a socket is returned
 	        while (true) {
 	            try {
-	                Log.i(TAG, "Open BT socket");
+	                Log.e(HOST_TAG, "Open BT socket");
 	                socket = mmServerSocket.accept();
 	            } catch (IOException e) {
+	            	Log.e(HOST_TAG, "Error opening socket", e);
 	                break;
 	            }
+	            Log.e(HOST_TAG, "No longer accepting connections");
 	            // If a connection was accepted
 	            if (socket != null) {
-	            	Log.e(TAG, "Server has recieved connection!");
+	            	Log.e(HOST_TAG, "Server has recieved connection!");
 	                // Do work to manage the connection (in a separate thread)
 //	                manageConnectedSocket(socket);
 	                try {
@@ -169,10 +177,10 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 				// Add the name and address to an array adapter to show in a
 				// ListView
 				mArrayAdapter
-						.add(btDevice.getName() + "-" + btDevice.getAddress());
+						.add(btDevice.getAddress());
 				
 				for(String s : mArrayAdapter)
-					Log.v(TAG,	s);
+					Log.e(CLIENT_TAG,	s);
 				
 				ArrayAdapter<String> adapter = new ArrayAdapter<String>(context,
 						android.R.layout.simple_list_item_1, android.R.id.text1, mArrayAdapter);
@@ -193,14 +201,12 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				
-				Log.e(TAG,((TextView)arg0.getChildAt(arg2)).getText().toString());
-				ConnectThread ct = new ConnectThread(btDevice);
-				ct.run();
-				
+				String address = ((TextView) arg1).getText().toString();
+				Log.e(CLIENT_TAG,"MAC: " + address);
+				BluetoothDevice device = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(address);
+				ConnectThread ct = new ConnectThread(device);
+				ct.start();
 			}
-			
-			
 		});
 	
 		Bundle bundle = getIntent().getExtras();
@@ -214,7 +220,7 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 					BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
 			startActivity(discoverableIntent);
 			AcceptThread at = new AcceptThread();
-			at.run();
+			at.start();
 		} else {
 			getAvailablePeers();
 		}
@@ -250,7 +256,7 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 		BluetoothAdapter mBluetoothAdapter = BluetoothAdapter
 				.getDefaultAdapter();
 		if (mBluetoothAdapter == null) {
-			Log.e(TAG, "Bluetooth is not supported on this device.");
+			Log.e(CLIENT_TAG, "Bluetooth is not supported on this device.");
 			return false;
 		}
 
@@ -265,7 +271,9 @@ public class BluetoothPeerSelector extends Activity implements IPongP2PAdapter {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		unregisterReceiver(mReceiver);
+		if(!isHost){
+			unregisterReceiver(mReceiver);
+		}
 	}
 
 }

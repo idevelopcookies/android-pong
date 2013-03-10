@@ -11,7 +11,9 @@
 		</activity>
 		<activity android:name=".PongPreferencesActivity" />
 		<activity android:name=".GameActivity" />
-		<activity android:name="org.euss.multi.BluetoothPeerSelector" />
+		<activity android:name="org.euss.multi.BluetoothPong" />
+		<activity android:name="org.euss.multi.DeviceListActivity" />
+		<service android:label="Pong Service" android:name="org.euss.multi.BluetoothChatService"></service>
 	</application>
 	<uses-sdk android:minSdkVersion="10" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />

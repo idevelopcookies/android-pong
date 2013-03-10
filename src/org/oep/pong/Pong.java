@@ -1,11 +1,13 @@
 package org.oep.pong;
 
 import org.euss.multi.BluetoothPeerSelector;
+import org.euss.multi.BluetoothPong;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,7 +19,8 @@ public class Pong extends Activity {
 //	private Channel mChannel;
 //	private BroadcastReceiver mReceiver;
 	private IntentFilter mIntentFilter;
-
+	private final static int MULTI_PLAYER_CHOICE = 1;
+	
 	protected void onCreate(Bundle icicle) {
 		super.onCreate(icicle);
 		setContentView(R.layout.act_title);
@@ -45,21 +48,21 @@ public class Pong extends Activity {
 		this.findViewById(R.id.title_btnNoPlayer).setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						startGame(false, false);
+						startGame(false, false, true);
 					}
 				});
 
 		this.findViewById(R.id.title_btnOnePlayer).setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						startGame(false, true);
+						startGame(false, true, true);
 					}
 				});
 
 		this.findViewById(R.id.title_btnTwoPlayer).setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						startGame(true, true);
+						startGame(true, true,   true);
 					}
 				});
 
@@ -67,33 +70,45 @@ public class Pong extends Activity {
 		this.findViewById(R.id.title_btnJoinMultiPlay).setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						Intent i = new Intent(v.getContext(), BluetoothPeerSelector.class);
+						Intent i = new Intent(v.getContext(), BluetoothPong.class);
 						Bundle bundle = new Bundle();
 					    bundle.putBoolean("isGameHost", false);
 					    i.putExtras(bundle);
-						startActivity(i);
+//						startActivityForResult(i, MULTI_PLAYER_CHOICE);
+					    startActivity(i);
 					}
 				});
 		
 		this.findViewById(R.id.title_btnHostMultiPlay).setOnClickListener(
 				new OnClickListener() {
 					public void onClick(View v) {
-						Intent i = new Intent(v.getContext(), BluetoothPeerSelector.class);
+						Intent i = new Intent(v.getContext(), BluetoothPong.class);
 						Bundle bundle = new Bundle();
 					    bundle.putBoolean("isGameHost", true);
 					    i.putExtras(bundle);
 						startActivity(i);
+						Log.w("ACTIVITY_END", "Game host has been created.");
 					}
 				});
 	}
 
-	protected void startGame(boolean redPlayer, boolean bluePlayer) {
+	protected void startGame(boolean redPlayer, boolean bluePlayer, boolean isHost) {
 		Intent i = new Intent(this, GameActivity.class);
 		i.putExtra(GameActivity.EXTRA_BLUE_PLAYER, bluePlayer);
 		i.putExtra(GameActivity.EXTRA_RED_PLAYER, redPlayer);
+		i.putExtra("IS_HOST", isHost);
 		startActivity(i);
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == MULTI_PLAYER_CHOICE){
+			if(resultCode == RESULT_OK){
+				
+			}
+		}
+		super.onActivityResult(requestCode, resultCode, data);
+	}
 //	protected void searchForOpponents() {
 //		initializeWifiManager();
 //		
