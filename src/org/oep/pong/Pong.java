@@ -1,6 +1,5 @@
 package org.oep.pong;
 
-import org.euss.multi.BluetoothPeerSelector;
 import org.euss.multi.BluetoothPong;
 
 import android.app.Activity;

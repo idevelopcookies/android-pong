@@ -16,8 +16,6 @@
 
 package org.euss.multi;
 
-import java.util.Random;
-
 import org.oep.pong.R;
 
 import android.app.Activity;
